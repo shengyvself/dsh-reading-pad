@@ -1,0 +1,239 @@
+/* dsh-reading-pad 阅读板样式（三主题 CSS 变量；设计 §二 数值） */
+.nrp-root {
+  --nrp-font-size: 17px;
+  --nrp-line-height: 1.6;
+  --nrp-measure: 30em;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--nrp-fg, #3b3b3b);
+  background: var(--nrp-bg, #faf9f6);
+}
+
+/* 三主题：Paper / Sepia / Night（设计 §二 色值） */
+.nrp-theme-paper {
+  --nrp-bg: #faf9f6;
+  --nrp-fg: #3b3b3b;
+  --nrp-muted: #8a8578;
+  --nrp-card: #f2efe7;
+  --nrp-border: rgba(59, 59, 59, 0.14);
+  --nrp-accent: #7a7566;
+  --nrp-code-bg: #f0ece2;
+}
+.nrp-theme-sepia {
+  --nrp-bg: #f5ecd9;
+  --nrp-fg: #4a4438;
+  --nrp-muted: #968c78;
+  --nrp-card: #ecdfc4;
+  --nrp-border: rgba(74, 68, 56, 0.16);
+  --nrp-accent: #8a7c5f;
+  --nrp-code-bg: #ecdfc4;
+}
+.nrp-theme-night {
+  --nrp-bg: #1e1e1e;
+  --nrp-fg: #b0b0b0;
+  --nrp-muted: #77736a;
+  --nrp-card: #262626;
+  --nrp-border: rgba(176, 176, 176, 0.16);
+  --nrp-accent: #8f8b80;
+  --nrp-code-bg: #262626;
+}
+
+.nrp-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid var(--nrp-border);
+  flex: none;
+  flex-wrap: wrap;
+}
+.nrp-sources { display: flex; gap: 4px; flex-wrap: wrap; }
+.nrp-source {
+  border: 1px solid var(--nrp-border);
+  background: transparent;
+  color: var(--nrp-fg);
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: 0.92;
+}
+.nrp-source-active { background: var(--nrp-card); font-weight: 600; }
+.nrp-source-off { opacity: 0.42; cursor: not-allowed; }
+.nrp-toolbar-right { display: flex; align-items: center; gap: 4px; }
+.nrp-font-badge { font-size: 11px; color: var(--nrp-muted); min-width: 34px; text-align: center; }
+.nrp-theme-switch { display: inline-flex; gap: 2px; margin-left: 4px; }
+.nrp-btn {
+  border: 1px solid var(--nrp-border);
+  background: transparent;
+  color: var(--nrp-fg);
+  font-size: 12px;
+  padding: 4px 9px;
+  border-radius: 8px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.nrp-btn:disabled { opacity: 0.38; cursor: default; }
+.nrp-theme-btn-active { background: var(--nrp-card); }
+
+.nrp-body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+
+/* 阅读区：限宽（30em；窄容器自动回落）、滚动 */
+.nrp-reader { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; position: relative; }
+.nrp-progress { height: 3px; background: var(--nrp-border); flex: none; }
+.nrp-progress-bar { height: 100%; background: var(--nrp-accent); transition: width 0.12s ease-out; }
+.nrp-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nrp-scroll { scroll-behavior: auto; }
+}
+.nrp-scroll.nrp-no-progress { overflow-y: auto; }
+
+/* 正文：max-width: min(100% - 2em, 30em)（设计 §二 行宽） */
+.nrp-content {
+  max-width: min(100% - 2em, var(--nrp-measure));
+  margin: 0 auto;
+  padding: 1.2em 0 3em;
+  font-family: "Noto Serif CJK SC", "Source Han Serif SC", "Songti SC", serif;
+  font-size: var(--nrp-font-size);
+  line-height: var(--nrp-line-height);
+  color: var(--nrp-fg);
+  word-break: break-word;
+}
+.nrp-chapter-h1 {
+  font-size: 1.35em;
+  font-weight: 600;
+  margin: 0 0 1em;
+  text-align: center;
+}
+/* 首行缩进 2em（仅正文段落；列表/引用/代码不缩进）*/
+.nrp-prose > p {
+  text-indent: 2em;
+  margin: 0 0 0.8em;
+}
+.nrp-prose > p:first-child { margin-top: 0; }
+.nrp-prose h1, .nrp-prose h2, .nrp-prose h3,
+.nrp-prose h4, .nrp-prose h5, .nrp-prose h6 {
+  margin: 1.3em 0 0.7em;
+  text-indent: 0;
+  line-height: 1.35;
+}
+.nrp-prose h1 { font-size: 1.3em; }
+.nrp-prose h2 { font-size: 1.2em; }
+.nrp-prose h3 { font-size: 1.1em; }
+.nrp-prose ul, .nrp-prose ol { margin: 0 0 0.8em; padding-left: 2.6em; }
+.nrp-prose li { margin: 0.2em 0; text-indent: 0; }
+.nrp-prose blockquote {
+  margin: 0 0 0.8em;
+  padding: 0.2em 1em;
+  border-left: 3px solid var(--nrp-border);
+  color: var(--nrp-muted);
+  text-indent: 0;
+}
+.nrp-prose hr { border: none; border-top: 1px solid var(--nrp-border); margin: 1.4em 0; }
+.nrp-prose code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: var(--nrp-code-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+}
+.nrp-prose pre {
+  background: var(--nrp-code-bg);
+  border: 1px solid var(--nrp-border);
+  border-radius: 8px;
+  padding: 0.8em 1em;
+  overflow-x: auto;
+  margin: 0 0 0.8em;
+  text-indent: 0;
+}
+.nrp-prose pre code { background: transparent; padding: 0; font-size: 0.85em; }
+.nrp-prose a { color: var(--nrp-accent); }
+.nrp-prose img { max-width: 100%; height: auto; }
+.nrp-prose table {
+  border-collapse: collapse;
+  margin: 0 0 0.8em;
+  font-size: 0.92em;
+  text-indent: 0;
+  display: block;
+  overflow-x: auto;
+}
+.nrp-prose th, .nrp-prose td {
+  border: 1px solid var(--nrp-border);
+  padding: 0.35em 0.7em;
+  text-align: left;
+}
+.nrp-prose th { background: var(--nrp-card); font-weight: 600; }
+
+.nrp-chapter-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--nrp-border);
+  flex: none;
+}
+.nrp-chapter-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--nrp-muted);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.nrp-endline {
+  text-align: center;
+  margin-top: 2.2em;
+  padding-top: 1em;
+  border-top: 1px dashed var(--nrp-border);
+}
+.nrp-btn.nrp-next { font-size: 14px; padding: 8px 18px; }
+.nrp-btn-ghost { cursor: default; }
+
+.nrp-error {
+  padding: 12px;
+  color: #b3261e;
+  font-size: 12px;
+  background: var(--nrp-bg);
+}
+.nrp-note {
+  padding: 18px 14px;
+  font-size: 13px;
+  color: var(--nrp-muted);
+  line-height: 1.6;
+}
+.nrp-link { color: var(--nrp-accent); cursor: pointer; text-decoration: underline; }
+
+.nrp-delivery-head { padding: 12px 14px 4px; text-align: center; flex: none; }
+.nrp-delivery-head .nrp-chapter-h1 { margin-bottom: 0.4em; }
+.nrp-delivery-meta { display: flex; gap: 10px; justify-content: center; align-items: center; font-size: 11px; color: var(--nrp-muted); flex-wrap: wrap; }
+.nrp-tag {
+  border: 1px solid var(--nrp-border);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.nrp-toast {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--nrp-card);
+  border: 1px solid var(--nrp-border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--nrp-muted);
+  padding: 3px 12px;
+  pointer-events: none;
+  z-index: 2;
+}
