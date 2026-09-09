@@ -36,6 +36,14 @@ Reading Pad 是 DSH 的沉浸式阅读板：模型通过 `reading_pad_send` 把�
 - **独立安装**：`git clone` 本仓 → `npm ci`（仅 esbuild）→ `npm run build` → 按 DSH 插件装配方式加载（bundle patch `cordis.patch.yml`；`@deepseek-ai/*` 与 `react` 由 DSH 宿主提供）。
 - 作品章节源依赖写作架构（writing workspace）的 HTTP RPC 通道；仅有「AI 投递文稿」源时其余功能完整可用。
 
+## 版本历史
+
+| 版本 | 日期 | GitHub 发布 | 要点 |
+|---|---|---|---|
+| v0.0.3 | 2026-09-08 | ✅ Release+tgz | 首发（沉浸式只读阅读板） |
+
+可下载的正式版本以 [Releases](https://github.com/shengyvself/dsh-reading-pad/releases) 为准。
+
 ## 版本与许可
 
 - 当前版本：**v0.0.3**（Apache-2.0）。
