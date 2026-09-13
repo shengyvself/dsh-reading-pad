@@ -2,7 +2,7 @@
  * dsh-reading-pad 服务端：
  * - ReadingPadService extends TypertRemoteService（remote 名 `readingPad`）：负责 AI 投递文稿的接收/持久化/读取。
  * - 模型写入口 `reading_pad_send`：接收 AI 已排版好的 Markdown（零文字处理），写入
- *   ~/.dsh/dsh-reading-pad-state.json（单当前篇 + 历史 ≤20，FIFO 淘汰）。
+ *   ~/.dsh/narrative-reading-pad-state.json（单当前篇 + 历史 ≤20，FIFO 淘汰）。
  * - 红线：只写 ~/.dsh/ 下的阅读板状态（会话展示文本，仿写字板状态），不触碰 canon/创作文件；
  *   读文件失败（缺失/JSON 非法/字段缺失）静默降级为空态，不崩 web。
  */
@@ -12,7 +12,7 @@ import { join, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
-const PAD_STATE_FILE = join(homedir(), '.dsh', 'dsh-reading-pad-state.json');
+const PAD_STATE_FILE = join(homedir(), '.dsh', 'narrative-reading-pad-state.json');
 const HISTORY_MAX = 20;
 
 const SEND_TOOL_NAME = 'reading_pad_send';
@@ -86,7 +86,7 @@ function readingPadResultRender(_args, value) {
 }
 
 /** Host API for the reading pad client, mounted into `ctx.remote.readingPad`. */
-class ReadingPadService extends TypertRemoteService {
+class NarrativeReadingPadService extends TypertRemoteService {
   static inject = ['tools'];
 
   constructor(ctx) {
@@ -156,7 +156,7 @@ class ReadingPadService extends TypertRemoteService {
 }
 
 function registerRemoteMarker(name) {
-  Remote(name)(ReadingPadService.prototype[name], {
+  Remote(name)(NarrativeReadingPadService.prototype[name], {
     name,
     static: false,
     private: false,
@@ -167,4 +167,4 @@ function registerRemoteMarker(name) {
 }
 for (const name of ['saveReading', 'loadReading']) registerRemoteMarker(name);
 
-export { ReadingPadService, ReadingPadService as default };
+export { NarrativeReadingPadService, NarrativeReadingPadService as default };

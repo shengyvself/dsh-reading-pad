@@ -1,7 +1,9 @@
 /**
- * dsh-reading-pad 浏览器端（better-sidebar tab）：
- * - tab id `dsh-reading-pad`（📖 阅读板，single，order 30）；1s 轮询注册（防比侧栏早就绪），
- *   保存 registerTab 返回的 disposer，成功即 clearInterval、卸载时调用 disposer（防重复注册）。
+ * dsh-reading-pad 浏览器端（**官方右侧栏 tab**）：
+ * - tab id `narrative-reading-pad`（📖 阅读板，order 30）；注册到官方 keyed 槽位
+ *   `sidebar.right.pane.tab` + `.title`（2026-09-13 解耦 dsh-better-sidebar；better-sidebar 本身
+ *   也是这两个原生槽位的宿主，故两种宿主下都可见）；1s 轮询注册（防槽位未就绪），
+ *   保存槽位 disposer，成功即 clearInterval、卸载时释放（防重复注册）。
  * - 内容源（M1）：AI 投递文稿（readingPad remote，2s 轮询 loadReading，按 revision 去重）+ 作品章节
  *   （复用 writing remote 既有 HTTP RPC /api/writing/workspaceIndex 与 /api/writing/chapterText）。
  * - 排版：三主题（Paper/Sepia/Night CSS 变量）、字号 16-20（A⁻/A⁺）、限宽 ≤30em、首行缩进 2em（仅 <p>）、
@@ -20,11 +22,39 @@ if (typeof document !== 'undefined' && document.querySelector(`style[data-plugin
   document.head.appendChild(tag);
 }
 
-export const inject = ['remote', 'locale'];
+export const inject = ['remote', 'locale', 'slots', 'sidebarRightTabs'];
 
-const NS = 'dshReadingPad';
+// 2026-09-13 解耦 dsh-better-sidebar（用户裁决）：注册到官方右侧栏 keyed 槽位。
+const TAB_SLOT = 'sidebar.right.pane.tab';
+const TAB_TITLE_SLOT = 'sidebar.right.pane.tab.title';
+const TAB_ID = 'narrative-reading-pad';
+const TAB_KIND = 'narrative-reading-pad';
+const SEEN_KEY = 'narrative-reading-pad.seen-revision.v1';
+
+/**
+ * 2026-09-13（**关键修复**）：原生右侧栏 tab 需两步注册——① ctx.sidebarRightTabs.register(类型)
+ * （决定它出现在「+」菜单并可被打开）② keyed 槽位提供 body/title。只做 ② 标签不出现
+ * （用户截图实证：右侧栏只有官方「文件」）。第三方用 priority 'extension'。
+ */
+function registerRightbarTabType(ctx, spec) {
+  if (typeof ctx.inject !== 'function') return;
+  ctx.inject(['sidebarRightTabs'], (injected) => {
+    const tabs = injected.get('sidebarRightTabs');
+    if (tabs === undefined) return;
+    ctx.effect(() => tabs.register({
+      id: spec.id,
+      kind: spec.kind,
+      priority: 'extension',
+      title: spec.title,
+      ...(spec.guide === undefined ? {} : { guide: [{ order: spec.guide.order, title: spec.guide.title, description: spec.guide.description }] })
+    }), 'narrative-reading-pad: right-sidebar tab type');
+  });
+}
+
+const NS = 'narrativeReadingPad';
 const zh = {
   title: '阅读板',
+  hint: '沉浸式只读阅读：AI 投递的文稿与作品章节',
   sourceDelivery: 'AI 投递文稿',
   sourceChapters: '作品章节',
   sourceOutline: '大纲',
@@ -48,6 +78,7 @@ const zh = {
 };
 const en = {
   title: 'Reading Pad',
+  hint: 'Immersive read-only reading for delivered prose and chapters',
   sourceDelivery: 'AI Delivery',
   sourceChapters: 'Manuscript',
   sourceOutline: 'Outline',
@@ -97,7 +128,7 @@ function jsonParameter(name) {
 }
 function descriptor(method, parameters, resultSymbol) {
   return {
-    id: `dsh-reading-pad#readingPad/${method}`,
+    id: `narrative-reading-pad#readingPad/${method}`,
     service: 'readingPad',
     namespace: 'readingPad',
     method,
@@ -107,17 +138,17 @@ function descriptor(method, parameters, resultSymbol) {
   };
 }
 const TYPERT_REMOTE = {
-  package: 'dsh-reading-pad',
+  package: 'narrative-reading-pad',
   descriptors: [
-    descriptor('saveReading', [jsonParameter('content'), jsonParameter('title'), jsonParameter('source')], 'dsh-reading-pad#SaveReadingResult'),
-    descriptor('loadReading', [], 'dsh-reading-pad#LoadReadingResult')
+    descriptor('saveReading', [jsonParameter('content'), jsonParameter('title'), jsonParameter('source')], 'narrative-reading-pad#SaveReadingResult'),
+    descriptor('loadReading', [], 'narrative-reading-pad#LoadReadingResult')
   ]
 };
 //#endregion
 
 //#region 阅读偏好（localStorage）
-const PREFS_KEY = 'dsh-reading-pad.prefs.v1';
-const SCROLL_KEY = 'dsh-reading-pad.scroll.v1';
+const PREFS_KEY = 'narrative-reading-pad.prefs.v1';
+const SCROLL_KEY = 'narrative-reading-pad.scroll.v1';
 function browserStorage() {
   try { return typeof window === 'undefined' ? null : window.localStorage; } catch { return null; }
 }
@@ -280,7 +311,7 @@ function renderMarkdown(src) {
 class ReadingBoundary extends React.Component {
   constructor(props) { super(props); this.state = { error: null, stack: '' }; }
   static getDerivedStateFromError(error) { return { error, stack: error?.stack ?? String(error) }; }
-  componentDidCatch(error, info) { console.error('[dsh-reading-pad]', error, info?.componentStack); }
+  componentDidCatch(error, info) { console.error('[narrative-reading-pad]', error, info?.componentStack); }
   render() {
     if (this.state.error !== null) {
       return React.createElement('div', { className: 'nrp-error' },
@@ -541,8 +572,15 @@ function ReadingPanel({ bridge, scope, getCwd, t }) {
 
 //#region apply：locale + remote 挂载 + bridge + tab 注册（1s 轮询 + disposer）
 export async function apply(ctx) {
-  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'dsh-reading-pad: dictionaries');
+  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'narrative-reading-pad: dictionaries');
   const t = ctx.locale.bind(NS);
+
+  registerRightbarTabType(ctx, {
+    id: TAB_ID,
+    kind: TAB_KIND,
+    title: () => t('title'),
+    guide: { order: 30, title: () => t('title'), description: () => t('hint') }
+  });
 
   // 对齐写作工作台 getCwd：会话 cwd 缺失时的兜底（connection describe）
   const getCwd = () => {
@@ -579,43 +617,66 @@ export async function apply(ctx) {
   let disposed = false;
   let tabRegistered = false;
   let tabTimer = null;
+  const slotDisposers = [];
+
+  const unseenBadge = () => {
+    try {
+      const seen = Number(browserStorage()?.getItem(SEEN_KEY) ?? 0);
+      return padState.latestRevision > seen ? '新' : null;
+    } catch { return null; }
+  };
+  const markSeen = () => {
+    try { browserStorage()?.setItem(SEEN_KEY, String(padState.latestRevision)); } catch { /* noop */ }
+  };
+
+  /** tab 主体：挂载即视为「已读」（替代 better-sidebar 的 onActivate 钩子）。 */
+  function TabBody(props) {
+    React.useEffect(() => { markSeen(); }, []);
+    return React.createElement(ReadingBoundary, null,
+      React.createElement(ReadingPanel, { bridge, scope: props?.scope, getCwd, t }));
+  }
+
+  /** tab 标题：📖＋标题＋未读徽标（2s 轮询，替代 better-sidebar 的 badge 钩子）。 */
+  function TabTitle() {
+    const [badge, setBadge] = React.useState(() => unseenBadge());
+    React.useEffect(() => {
+      const timer = globalThis.setInterval(() => setBadge(unseenBadge()), 2000);
+      return () => globalThis.clearInterval(timer);
+    }, []);
+    return React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 6 } },
+      React.createElement('span', { style: { fontSize: 14 } }, '📖'),
+      t('title'),
+      badge === null ? null : React.createElement('span', {
+        style: { fontSize: 10, lineHeight: '14px', padding: '0 4px', borderRadius: 6, background: 'var(--dsh-accent, #2f7d5d)', color: '#fff' }
+      }, badge));
+  }
 
   function registerReadingTab() {
     if (disposed) return true;
-    const bs = ctx.get('betterSidebar');
-    if (!bs || typeof bs.registerTab !== 'function') return false;
+    if (typeof ctx.slots?.inject !== 'function') return false;
     try {
-      bs.registerTab({
-        id: 'dsh-reading-pad',
-        title: () => t('title'),
-        icon: React.createElement('span', { style: { fontSize: 14 } }, '📖'),
-        single: true,
-        order: 30,
-        badge: () => {
-          try {
-            const seen = Number(browserStorage()?.getItem('dsh-reading-pad.seen-revision.v1') ?? 0);
-            return padState.latestRevision > seen ? '新' : null;
-          } catch { return null; }
-        },
-        onActivate: () => {
-          try { browserStorage()?.setItem('dsh-reading-pad.seen-revision.v1', String(padState.latestRevision)); } catch { /* noop */ }
-        },
-        component: (props) => React.createElement(ReadingBoundary, null,
-          React.createElement(ReadingPanel, { bridge, scope: props?.scope, getCwd, t }))
-      });
+      slotDisposers.push(ctx.slots.inject(TAB_SLOT, () => ctx.slots.register({
+        name: TAB_SLOT, key: TAB_ID, order: 30, locale: NS, inject: (sessionId) => ({ sessionId })
+      }, TabBody)));
+      slotDisposers.push(ctx.slots.inject(TAB_TITLE_SLOT, () => ctx.slots.register({
+        name: TAB_TITLE_SLOT, key: TAB_ID
+      }, TabTitle)));
       tabRegistered = true;
       return true;
     } catch (e) {
-      // HMR 重载后旧 tab 仍在注册表中：重复注册视为已注册（幂等），不当作失败
-      const msg = String(e?.message ?? e);
-      if (msg.includes('already registered')) { tabRegistered = true; return true; }
-      console.error('[dsh-reading-pad] registerTab failed', e);
+      console.error('[narrative-reading-pad] native tab register failed', e);
       return false;
     }
   }
   if (!registerReadingTab()) {
     tabTimer = globalThis.setInterval(() => { if (registerReadingTab()) globalThis.clearInterval(tabTimer); }, 1000);
   }
-  return () => { disposed = true; if (tabTimer !== null) globalThis.clearInterval(tabTimer); disposeRemote(); };
+  return () => {
+    disposed = true;
+    if (tabTimer !== null) globalThis.clearInterval(tabTimer);
+    for (const dispose of slotDisposers) { try { dispose?.(); } catch { /* 忽略 */ } }
+    slotDisposers.length = 0;
+    disposeRemote();
+  };
 }
 //#endregion
