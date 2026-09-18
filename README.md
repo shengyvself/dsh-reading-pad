@@ -16,7 +16,7 @@
     <img src="https://img.shields.io/github/stars/shengyvself/dsh-reading-pad?style=flat-square&label=stars&color=4D6BFE" alt="Stars">
   </a>
   <img src="https://img.shields.io/badge/license-Apache--2.0-0B7285?style=flat-square" alt="Apache-2.0">
-  <img src="https://img.shields.io/badge/DSH-0.1.0--rc.5+-4D6BFE?style=flat-square" alt="DSH 0.1.0-rc.5+">
+  <img src="https://img.shields.io/badge/DSH-0.1.5--rc.2+-4D6BFE?style=flat-square" alt="DSH 0.1.5-rc.2+">
   <img src="https://img.shields.io/badge/Web-4D6BFE?style=flat-square" alt="DSH Web">
 </p>
 
@@ -49,7 +49,7 @@ dsh plugin --profile web add dsh-reading-pad
 
 安装后**重启 `dsh web`**，然后打开右侧栏 → 从「+」菜单添加「📖 阅读板」tab。
 
-**Requires DSH client packages >=0.1.0-rc.5.** 使用官方原生右侧栏 keyed 槽位（`sidebar.right.pane.tab`），**不依赖** `dsh-better-sidebar`。
+**Requires DSH client packages >=0.1.5-rc.2.** 使用官方原生右侧栏 keyed 槽位（`sidebar.right.pane.tab`），**不依赖** `dsh-better-sidebar`。
 
 也可以从 GitHub 直装（不走 npm）：
 
@@ -82,9 +82,9 @@ dsh plugin --profile web add github:shengyvself/dsh-reading-pad
 | 场景 | DSH 版本 | 插件版本 |
 |---|---|---|
 | **推荐** | **`0.1.5-rc.2+`**（当前维护版） | **`0.1.0`** |
-| 最低兼容 | `0.1.0-rc.5+` | `0.1.0` |
+| 最低兼容 | `0.1.5-rc.2+` | `0.1.0` |
 
-安装插件**不会**升级宿主 DSH。peerDependencies 声明的最低客户端包版本是 `>=0.1.0-rc.5`，实测在 `0.1.5-rc.2` 上跑通。
+安装插件**不会**升级宿主 DSH。peerDependencies 声明的最低客户端包版本是 `>=0.1.5-rc.2`，实测在 `0.1.5-rc.2` 上跑通。
 
 ## Security
 

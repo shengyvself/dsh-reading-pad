@@ -16,7 +16,7 @@
     <img src="https://img.shields.io/github/stars/shengyvself/dsh-reading-pad?style=flat-square&label=stars&color=4D6BFE" alt="Stars">
   </a>
   <img src="https://img.shields.io/badge/license-Apache--2.0-0B7285?style=flat-square" alt="Apache-2.0">
-  <img src="https://img.shields.io/badge/DSH-0.1.0--rc.5+-4D6BFE?style=flat-square" alt="DSH 0.1.0-rc.5+">
+  <img src="https://img.shields.io/badge/DSH-0.1.5--rc.2+-4D6BFE?style=flat-square" alt="DSH 0.1.5-rc.2+">
   <img src="https://img.shields.io/badge/Web-4D6BFE?style=flat-square" alt="DSH Web">
 </p>
 
@@ -49,7 +49,7 @@ dsh plugin --profile web add dsh-reading-pad
 
 After installing, **restart `dsh web`**, then open the right sidebar → add the "📖 Reading Pad" tab from the "+" menu.
 
-**Requires DSH client packages >=0.1.0-rc.5.** Uses the official native right-sidebar keyed slots (`sidebar.right.pane.tab`), **no dependency** on `dsh-better-sidebar`.
+**Requires DSH client packages >=0.1.5-rc.2.** Uses the official native right-sidebar keyed slots (`sidebar.right.pane.tab`), **no dependency** on `dsh-better-sidebar`.
 
 You can also install directly from GitHub (skipping npm):
 
@@ -82,9 +82,9 @@ Outline / lore / drafting-pad drafts are phase-2 placeholders (greyed out).
 | Use case | DSH version | Plugin version |
 |---|---|---|
 | **Recommended** | **`0.1.5-rc.2+`** (currently maintained) | **`0.1.0`** |
-| Minimum compatible | `0.1.0-rc.5+` | `0.1.0` |
+| Minimum compatible | `0.1.5-rc.2+` | `0.1.0` |
 
-Installing the plugin **does not** upgrade the host DSH. The `peerDependencies` declare a minimum client-package version of `>=0.1.0-rc.5`; verified working on `0.1.5-rc.2`.
+Installing the plugin **does not** upgrade the host DSH. The `peerDependencies` declare a minimum client-package version of `>=0.1.5-rc.2`; verified working on `0.1.5-rc.2`.
 
 ## Security
 
