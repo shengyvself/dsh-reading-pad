@@ -1,7 +1,22 @@
 {
   "name": "dsh-reading-pad",
   "version": "0.1.0",
-  "description": "dsh-reading-pad 阅读板：沉浸式只读阅读（AI 投递文稿 + 作品章节），官方右侧栏 tab，三主题/限宽排版/进度条/章节浏览。",
+  "description": "Immersive read-only reading panel for DSH: the model delivers pre-formatted Markdown to a native right-sidebar tab, or you browse manuscript chapters read-only. Three low-blue-light themes, 30em measure, progress bar, scroll persistence.",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "deepseek-harness-plugin",
+    "reading",
+    "reading-pad",
+    "reader",
+    "markdown",
+    "typography",
+    "sidebar",
+    "right-sidebar",
+    "chapter",
+    "manuscript"
+  ],
   "type": "module",
   "main": "./lib/index.js",
   "exports": {
@@ -15,9 +30,19 @@
   },
   "files": [
     "lib",
+    "assets",
     "cordis.patch.yml",
-    "README.md"
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "ARCHITECTURE.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "LICENSE"
   ],
+  "engines": {
+    "node": "^22.19.0 || >=24"
+  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
@@ -48,6 +73,10 @@
   },
   "devDependencies": {
     "esbuild": "^0.25.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shengyvself/dsh-reading-pad.git"
   },
   "license": "Apache-2.0"
 }
