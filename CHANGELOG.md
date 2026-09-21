@@ -6,7 +6,13 @@
 
 > 2026-09-13 补建：本模块此前**无独立 CHANGELOG**（架构级 `dsh-reading-pad/CHANGELOG.md` 有记，
 > 模块目录缺文件——`--check` 不校验模块级日志故一直未被发现）。以下条目据**架构 CHANGELOG 的组件行**
-> 与**维护会话**（`进度/维护会话.md`）回填，覆盖 0.0.x → 0.1.0 全量。
+> 与**维护会话**回填，覆盖 0.0.x → 0.1.0 全量。
+
+## 0.1.1 — 2026-09-21
+- **0.1.6 typert strict codec 适配**：DSH 0.1.6 收紧 typert 协议——strict codec 必须提供 `create()` 工厂；rc.5 时代的内联 `schema: xxx()` 写法令**客户端** `apply()` 抛错，页面报 `web boot: N entry did not activate`；**服务端 journal 一行都不报**（装饰器自动生成路径不受影响），只能从浏览器侧验收。
+  - **改动**：`src/client.js` 与 `lib/client.js` 的 `codec` / `result` 两处 `schema: xxx()` → `create: xxx`（共 2 处 × 2 文件 = 4 处，实际源 2 行 + 构建产物 2 行）。
+  - **本插件特殊性**：dsh-reading-pad 是本仓内**唯一**手写 typert 描述符的插件（`descriptor()` + `TYPERT_REMOTE`），故是 0.1.6 升级的必改点；无其他调用面。
+  - **验收**：`node --check src/client.js` 通过；`lib/client.js` build 产物与 src 一致；浏览器侧 0.1.6 环境客户端激活后无 `web boot: N entry did not activate` 报错。
 
 ## 0.1.0 — 2026-09-13
 - **中版本里程碑**（用户指令）。登记性变更，无额外代码改动。

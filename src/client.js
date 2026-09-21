@@ -123,7 +123,7 @@ function jsonParameter(name) {
     name,
     wire: name,
     source: 'json',
-    codec: { mode: 'strict', typeSymbol: 'typescript#string', schema: strSchema() }
+    codec: { mode: 'strict', typeSymbol: 'typescript#string', create: strSchema }
   };
 }
 function descriptor(method, parameters, resultSymbol) {
@@ -134,7 +134,7 @@ function descriptor(method, parameters, resultSymbol) {
     method,
     invocation: { kind: 'direct' },
     parameters,
-    result: { mode: 'strict', typeSymbol: resultSymbol, schema: objSchema() }
+    result: { mode: 'strict', typeSymbol: resultSymbol, create: objSchema }
   };
 }
 const TYPERT_REMOTE = {

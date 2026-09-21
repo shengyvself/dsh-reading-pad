@@ -1,6 +1,6 @@
 {
   "name": "dsh-reading-pad",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Immersive read-only reading panel for DSH: the model delivers pre-formatted Markdown to a native right-sidebar tab, or you browse manuscript chapters read-only. Three low-blue-light themes, 30em measure, progress bar, scroll persistence.",
   "keywords": [
     "dsh",
